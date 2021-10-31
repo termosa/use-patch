@@ -1,6 +1,6 @@
 {
   "name": "use-patch",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Track diff when changing objects",
   "author": "Stanislav Termosa <termosa.stanislav@gmail.com> (https://me.st)",
   "license": "MIT",
