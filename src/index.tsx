@@ -34,7 +34,14 @@ const selectDifferentProperties = <PatchType extends Record<string, unknown>>(
   }, {});
 };
 
-export function usePatch<Type extends Record<string, unknown>>(origin: Type) {
+export interface PatchFunction<Type> {
+  (changes: Partial<Type>, diff: Partial<Type>, origin: Type): Partial<Type>;
+}
+
+export function usePatch<Type extends Record<string, unknown>>(
+  origin: Type,
+  patch?: PatchFunction<Type>
+) {
   const [diff, setDiff] = React.useState<Partial<Type>>({});
 
   return React.useMemo(
@@ -43,11 +50,15 @@ export function usePatch<Type extends Record<string, unknown>>(origin: Type) {
       diff,
       changed: Boolean(Object.keys(diff).length),
       apply: (changes: Partial<Type>) => {
-        const newDiff = selectDifferentProperties(origin, { ...diff, ...changes });
+        const newDiff = patch
+          ? patch(changes, diff, origin)
+          : selectDifferentProperties(origin, { ...diff, ...changes });
         setDiff(newDiff);
       },
       set: (changes: Partial<Type>) => {
-        const newDiff = selectDifferentProperties(
+        const newDiff = patch
+          ? patch(changes, {}, origin)
+          : selectDifferentProperties(
               origin,
               Object.assign(
                 Object.keys(origin).reduce(
